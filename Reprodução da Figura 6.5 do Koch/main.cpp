@@ -21,7 +21,7 @@
 using namespace std;
 
 // step size
-#define step 0.01
+#define step 0.001
 
 class Neuron
 {
@@ -41,10 +41,11 @@ class Neuron
 	  	double dot_h(double,double,double,double);
 	  	double I;
   		double V,N,M,H;
+                
 };
 
 double Neuron::dot_v(double v,double m,double n,double h)
-{return Gna*(pow(m,3))*h*(Ena-v) + Gk*(pow(n,4))*(Ek-v) + Gm*(Vrest-v) + I/9*(M_PI);}
+{return Gna*(pow(m,3))*h*(Ena-v) + Gk*(pow(n,4))*(Ek-v) + Gm*(Vrest-v) + I/(9*(M_PI));}
 
 double Neuron::dot_m(double v,double m,double n,double h)
 {return ((25-v)/(10*(exp((25-v)/10)-1)))*(1-m) - 4*(exp(-v/18))*m;}	
@@ -57,10 +58,23 @@ double Neuron::dot_h(double v,double m,double n,double h)
 
 double Neuron::Euler(double v,double m,double n,double h)
 {
-	V = V + step*dot_v(v,m,n,h);
-	M = M + step*dot_m(v,m,n,h);
-	N = N + step*dot_n(v,m,n,h);
-	H = H + step*dot_h(v,m,n,h);
+
+        double Vo, Mo,No,Ho; 
+        Vo = v;
+        Mo = m;
+        No = n;
+        Ho = h;
+	Vo = Vo + step*dot_v(v,m,n,h);
+	Mo = Mo + step*dot_m(v,m,n,h);
+	No = No + step*dot_n(v,m,n,h);
+	Ho = Ho + step*dot_h(v,m,n,h);
+        V = Vo;
+        M = Mo;
+        N = No;
+        H = Ho;
+
+
+
 }
 
 int main()
@@ -74,7 +88,7 @@ int main()
 	ofstream file;
 	file.open("figure6.5.csv");
 
-	int iterations = 50000;
+	int iterations = 200000;
 	double time = 0.0;
 
 	//Como inicializar v, m, n e h?
@@ -85,7 +99,7 @@ int main()
 
 	for(int i = 0; i <= iterations; i++)
 	{
-		time = time + step;
+		time = step*i;
 		neuron.Euler(neuron.V,neuron.M,neuron.N,neuron.H);
 		file<<time<<","<<neuron.V<<","<<neuron.M<<","<<neuron.N<<","<<neuron.H<<endl;
 	}
