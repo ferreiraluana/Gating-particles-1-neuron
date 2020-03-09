@@ -34,6 +34,12 @@ class Neuron
 		double Ena = 115.0;
 		double Ek = -12;
 		double P = step; // RK4 integration step
+		double v1,c1,k1,r1;
+		double v2,c2,k2,r2;
+		double v3,c3,k3,r3;
+		double v4,c4,k4,r4;
+		double v0,m0,n0,h0;
+		double Vmais,mmais,nmais,hmais;
 	public:
 		double Euler(double, double,double,double);
 		void RK4(void);
@@ -60,69 +66,63 @@ double Neuron::dot_h(double v,double m,double n,double h)
 
 double Neuron::Euler(double v,double m,double n,double h)
 {        
-    double Vo = v;
-    double Mo = m;
-    double No = n;
-    double Ho = h;
-	Vo = Vo + step*dot_v(v,m,n,h);
-	Mo = Mo + step*dot_m(v,m,n,h);
-	No = No + step*dot_n(v,m,n,h);
-	Ho = Ho + step*dot_h(v,m,n,h);
-	V = Vo;
-    M = Mo;
-    N = No;
-    H = Ho;
+    v0 = v;
+    m0 = m;
+    n0 = n;
+    h0 = h;
+	v0 = v0 + step*dot_v(v,m,n,h);
+	m0 = m0 + step*dot_m(v,m,n,h);
+	n0 = n0 + step*dot_n(v,m,n,h);
+	h0 = h0 + step*dot_h(v,m,n,h);
+	V = v0;
+    M = m0;
+    N = n0;
+    H = h0;
 }
 
 void Neuron::RK4()
 {
 	//implementar
-	double Vo = V;
-    double Mo = M;
-    double No = N;
-    double Ho = H;
+	v0 = V;
+    m0 = M;
+    n0 = N;
+    h0 = H;	
 
-	double v1,c1,k1,r1;
-	double v2,c2,k2,r2;
-	double v3,c3,k3,r3;
-	double v4,c4,k4,r4;
-	double v0,m0,n0,h0;
+  v1 = dot_v(V,M,N,H);  
+  k1 = dot_m(V,M,N,H);
+  c1 = dot_n(V,M,N,H);
+  r1 = dot_h(V,M,N,H);
+  Vmais = V+P*0.5*v1;  
+  mmais = M+P*0.5*k1;
+  nmais = N+P*0.5*c1;
+  hmais = H+P*0.5*r1;
 
-  v1 = dot_v(V,N,M,H);  
-  k1 = dot_m(V,N,M,H);
-  c1 = dot_n(V,N,M,H);
-  r1 = dot_h(V,N,M,H);
-  v0 = V+P*0.5*v1;  
-  m0 = M+P*0.5*k1;
-  n0 = N+P*0.5*c1;
-  h0 = H+P*0.5*r1;
+  v2 = dot_v(Vmais,mmais,nmais,hmais);  
+  k2 = dot_m(Vmais,mmais,nmais,hmais);
+  c2 = dot_n(Vmais,mmais,nmais,hmais);
+  r2 = dot_h(Vmais,mmais,nmais,hmais);
+  Vmais = V+P*0.5*v2;  
+  mmais = M+P*0.5*k2;
+  nmais = N+P*0.5*c2;
+  hmais = H+P*0.5*r2;
   
-  v2 = dot_v(v0,m0,n0,h0);  
-  k2 = dot_m(v0,m0,n0,h0);
-  c2 = dot_n(v0,m0,n0,h0);
-  r2 = dot_h(v0,m0,n0,h0);
-  v0 = V+P*0.5*v2;  
-  m0 = M+P*0.5*k2;
-  n0 = N+P*0.5*c2;
-  h0 = H+P*0.5*r2;
+  v3 = dot_v(Vmais,mmais,nmais,hmais);  
+  k3 = dot_m(Vmais,mmais,nmais,hmais);
+  c3 = dot_n(Vmais,mmais,nmais,hmais);
+  r3 = dot_h(Vmais,mmais,nmais,hmais);
+  Vmais = V+P*v3;
+  nmais = N+P*c3;
+  mmais = M+P*k3;
+  hmais = H+P*r3;
   
-  v3 = dot_v(v0,m0,n0,h0);  
-  k3 = dot_m(v0,m0,n0,h0);
-  c3 = dot_n(v0,m0,n0,h0);
-  r3 = dot_h(v0,m0,n0,h0);
-  v0 = V+P*v3;
-  n0 = N+P*c3;
-  m0 = M+P*k3;
-  h0 = H+P*r3;
-  
-  v4 = dot_v(v0,m0,n0,h0);
-  k4 = dot_m(v0,m0,n0,h0);
-  c4 = dot_n(v0,m0,n0,h0);
-  r4 = dot_h(v0,m0,n0,h0);
-  V = Vo+(P/6.0)*(v1+2.0*v2+2.0*v3+v4);
-  M = Mo+(P/6.0)*(k1+2.0*k2+2.0*k3+k4);
-  N = No+(P/6.0)*(c1+2.0*c2+2.0*c3+c4);  
-  H = Ho+(P/6.0)*(r1+2.0*r2+2.0*r3+r4);
+  v4 = dot_v(Vmais,mmais,nmais,hmais);
+  k4 = dot_m(Vmais,mmais,nmais,hmais);
+  c4 = dot_n(Vmais,mmais,nmais,hmais);
+  r4 = dot_h(Vmais,mmais,nmais,hmais);
+  V = v0+(P/6.0)*(v1+2.0*v2+2.0*v3+v4);
+  M = m0+(P/6.0)*(k1+2.0*k2+2.0*k3+k4);
+  N = n0+(P/6.0)*(c1+2.0*c2+2.0*c3+c4);  
+  H = h0+(P/6.0)*(r1+2.0*r2+2.0*r3+r4);
 }
 
 int main()
@@ -130,12 +130,14 @@ int main()
 	
 	Neuron neuron;
 	cout << "This is running Hodgkin-Huxley Model"<< endl;
-	cout << "The current I(pA): 280"<< endl;
-	// cin >> neuron.I;
-	neuron.I = 280;
+	cout << "Enter the current I(pA): 280 or 300"<< endl;
+	cin >> neuron.I;	
 
 	ofstream file;
-	file.open("1neuronI280.csv");
+	if(neuron.I == 300)
+	   file.open("1neuronI300.csv");
+	else if(neuron.I == 280)
+		file.open("1neuronI280.csv");
 
 	int iterations = 40000;
 	double time = 0.0;

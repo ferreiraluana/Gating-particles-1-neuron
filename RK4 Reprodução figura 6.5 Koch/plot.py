@@ -4,7 +4,7 @@ import pandas as pd
 file1 = pd.read_csv('1neuronI300.csv', sep=',', names = ['time','V','m','n','h'])
 file2 = pd.read_csv('1neuronI280.csv', sep=',', names = ['time','V','m','n','h'])
 
-limite = [0,2000]
+limite = [0,20000]
 lim_mnh = [0,2000]
 
 plt.subplot(2,2,1)
